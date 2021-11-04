@@ -78,11 +78,11 @@ public class RecuDAO {
 			while(rsSet.next())
 			{
 				Recette recu=new Recette();
+				recu.setObjet(rsSet.getString("objet"));
 				recu.setID(rsSet.getInt("ID"));
 				recu.setDestination(rsSet.getString("destination"));
 				recu.setTax(rsSet.getDouble("tax"));
 				recu.setPrix(rsSet.getDouble("prix"));
-				recu.setObjet(rsSet.getString("objet"));
 				recu.setTotal(rsSet.getDouble("total"));
 				RecetteList.add(recu);
 			}
@@ -97,7 +97,7 @@ public class RecuDAO {
 	}
 	public static ObservableList<Recette> searchRecette(String recuId) throws ClassNotFoundException, SQLException
 	{
-		String sql="select * from recu where ID="+recuId;
+		String sql="select * from recu where id="+recuId;
 		try
 		{
 		 ResultSet rsSet=DBUtilitaires.dbExecute(sql)	;
