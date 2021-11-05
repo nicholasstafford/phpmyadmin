@@ -37,11 +37,16 @@ import javafx.stage.Stage;
 
 public class SampleController implements Initializable{
 
-   // @FXML
-   // private TableView<Recette> recetteTable;
+    @FXML
+    private TableView<Recette> recetteTable;
+    
+    @FXML
+    private TableColumn<Recette, String> idColumn;
     
     @FXML
     private Label lblID;
+    
+    private int myID=0;
 
     @FXML
     private TextField txtPrix;
@@ -49,17 +54,17 @@ public class SampleController implements Initializable{
     @FXML
     private Label lblResults;
 
-   // @FXML
-   // private TableColumn<Recette, String> prixColumn;
+    @FXML
+    private TableColumn<Recette, String> prixColumn;
 
-   // @FXML
-   // private TableColumn<Recette, String> taxColumn;
+    @FXML
+    private TableColumn<Recette, String> taxColumn;
 
     @FXML
     private ToggleGroup rdoBTN;
 
-  //  @FXML
-   // private TableColumn<Recette, String> totalColumn;
+    @FXML
+    private TableColumn<Recette, String> totalColumn;
 
     @FXML
     private RadioButton rdoCanada;
@@ -85,8 +90,8 @@ public class SampleController implements Initializable{
     @FXML
     private Button btnRecommencer;
 
-   // @FXML
-   // private TableColumn<Recette, String> objetColumn;
+    @FXML
+    private TableColumn<Recette, String> objetColumn;
 
     @FXML
     private Button btnModifier;
@@ -94,8 +99,8 @@ public class SampleController implements Initializable{
     @FXML
     private TextField txtTax;
 
-   // @FXML
-   // private TableColumn<Recette, String> destinationColumn;
+    @FXML
+    private TableColumn<Recette, String> destinationColumn;
 
     @FXML
     private RadioButton rdoUSA;
@@ -124,6 +129,7 @@ public class SampleController implements Initializable{
 		RecetteList=RecuDAO.getAllRecords();
 		cboID.setItems(RecetteList);
 		
+		
 	}
     
     @FXML
@@ -143,13 +149,14 @@ public class SampleController implements Initializable{
 	{
 		cboObj.getItems().addAll(list);
 		
-	/*	objetColumn.setCellValueFactory(new PropertyValueFactory<>("Objet"));
+		objetColumn.setCellValueFactory(new PropertyValueFactory<>("Objet"));
 		prixColumn.setCellValueFactory(new PropertyValueFactory<>("Prix"));
 		destinationColumn.setCellValueFactory(new PropertyValueFactory<>("Destination"));
 		taxColumn.setCellValueFactory(new PropertyValueFactory<>("Tax"));
 		totalColumn.setCellValueFactory(new PropertyValueFactory<>("Total"));
+		idColumn.setCellValueFactory(new PropertyValueFactory<>("ID"));
 		
-		recetteTable.setItems(recetteData); */
+		recetteTable.setItems(recetteData);
 		
 		btnModifier.setDisable(true);
 		btnEffacer.setDisable(true);
@@ -169,7 +176,7 @@ public class SampleController implements Initializable{
 		
 		showRecette(null);
 		
-		//recetteTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue)-> showRecette(newValue));
+		recetteTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue)-> showRecette(newValue));
 	}
 
 	
@@ -181,6 +188,9 @@ public class SampleController implements Initializable{
 			txtPrix.setText(Double.toString(recette.getPrix()));
 			lblID.setText(String.valueOf(recette.getID()));
 			txtTotal.setText(Double.toString(recette.getTotal()));
+			
+			myID=recette.getID();
+			
 			if(rdoMex.isSelected())
 			{
 				rdoMex.setText("Méxique");
@@ -381,42 +391,51 @@ public class SampleController implements Initializable{
 	@FXML
 	public void updateRecette() throws ClassNotFoundException, SQLException
 	{
-		// Recette recette = recetteTable.getSelectionModel().getSelectedItem();
+		Recette recette = recetteTable.getSelectionModel().getSelectedItem();
 		
-		/*recette.setPrix(Double.parseDouble(txtPrix.getText()));
+		recette.setPrix(Double.parseDouble(txtPrix.getText()));
 		recette.setTotal(Double.parseDouble(txtTotal.getText()));
 		recette.setObjet(cboObj.getValue());
-		recette.setTax(Double.parseDouble(txtTax.getText()));*/
-		String D = "";
+		recette.setTax(Double.parseDouble(txtTax.getText()));
+			if(rdoCanada.isSelected())
+			{
+				recette.setDestination("Canada");
+			}
+			else
+				if(rdoUSA.isSelected());
+				{
+					recette.setDestination("États-Unis");
+				}
+				if(rdoMex.isSelected())
+					{
+						recette.setDestination("Méxique");
+					}
+		
+		String Destination = "";
 		if(rdoCanada.isSelected())
 		{
-		//recette.setDestination("Canada");
-		D = "Canada";
+		Destination = "Canada";
 		}
 		else
 			if(rdoUSA.isSelected())
 			{
-				//recette.setDestination("États-Unis");
-				D = "États-Unis";
+				Destination = "États-Unis";
 			}
 			else
 				if(rdoMex.isSelected())
 				{
-					//recette.setDestination("Méxique");
-					D = "États-Unis";
+					Destination = "Méxique";
 				}
-		RecuDAO.updateRecu(Integer.parseInt(lblID.getText()), 
-				cboObj.getValue(), D, Double.parseDouble(txtPrix.getText()), 
-				Double.parseDouble(txtTax.getText()), Double.parseDouble(txtTotal.getText()));
+		RecuDAO.updateRecu(myID, cboObj.getValue(), Destination, Double.parseDouble(txtPrix.getText()), Double.parseDouble(txtTax.getText()), Double.parseDouble(txtTotal.getText()));
 		lblResults.setText("Les données de " + cboObj.getValue() + " ont été mises à jour");
 		reinitialiser();
-	//	recetteTable.refresh();
+		recetteTable.refresh();
 	}
 	
 	@FXML
 	public void deleteRecette() throws ClassNotFoundException, SQLException
 	{
-		/*int selectedIndex = recetteTable.getSelectionModel().getSelectedIndex();
+		int selectedIndex = recetteTable.getSelectionModel().getSelectedIndex();
 		if(selectedIndex >= 0)
 		{
 			Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -425,7 +444,7 @@ public class SampleController implements Initializable{
 			Optional<ButtonType> result = alert.showAndWait();
 			if(result.get()==ButtonType.OK)
 				recetteTable.getItems().remove(selectedIndex); 
-		}*/
+		}
 		RecuDAO.deleteRecetteById(Integer.parseInt(lblID.getText()));
 		lblResults.setText("Les données ont été effacées");
 		reinitialiser();
@@ -475,8 +494,8 @@ public class SampleController implements Initializable{
 			setRecetteFilePath(file);
 			
 			
-		//	Stage pStage=(Stage) recetteTable.getScene().getWindow();
-		//	pStage.setTitle(file.getName());
+			Stage pStage=(Stage) recetteTable.getScene().getWindow();
+			pStage.setTitle(file.getName());
 			
 		} catch (Exception e) {
 			Alert alert = new Alert(AlertType.ERROR);
@@ -501,8 +520,8 @@ public class SampleController implements Initializable{
 			
 			setRecetteFilePath(file);
 			
-		//	Stage pStage = (Stage) recetteTable.getScene().getWindow();
-		//	pStage.setTitle(file.getName());
+			Stage pStage = (Stage) recetteTable.getScene().getWindow();
+			pStage.setTitle(file.getName());
 		}
 		catch(Exception e)
 		{

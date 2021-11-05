@@ -80,5 +80,11 @@ public class Recette
 	{
 		this.total = total;
 	}
+	@Override
+	public String toString()
+	{
+		String s=this.getObjet()+ " "+this.getID();
+		return s;
+	}
 
 }
